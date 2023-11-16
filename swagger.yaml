@@ -285,13 +285,149 @@ paths:
               properties:
                 ref:
                   type: string
-                  description: the commit_id to revert to. If ommitted, the branch will be reverted to the most recent commit. 
+                  description: the commit_id, branch, and tag to revert to. If ommitted, the branch will be reverted to the most recent commit. 
                   example: 'branch_name_new'
       responses:
         '200':
           description: OK
         '400': 
           description: No such repository or directory
+### Tags ### 
+  /repositories/{repository_name}/tags:
+    get: 
+      description: >-
+        Get the list of tags for the repository
+      parameters: [
+        {
+          name: "repository_name",
+          in: "path",
+          description: "the repository to query the tags for",
+          required: true, 
+          schema: {
+            type: "string"
+          }
+        },
+        {
+          name: "prefix",
+          in: "query",
+          description: "the prefix to filter the tags on",
+          required: False, 
+          schema: {
+            type: "string"
+          }
+        },
+        {
+          name: "limit",
+          in: "query",
+          description: "the number of results to return",
+          required: False,
+          schema: {
+            type: "integer"
+          }
+        }
+        ]
+      responses: 
+        '200': 
+          description: OK
+        '400': 
+          description: No such repository
+    post:
+      description: >-
+        Create tag for the provided repository
+      parameters: [
+        {
+          name: "repository_name",
+          in: "path",
+          description: "the repository to query the tags for",
+          required: true, 
+          schema: {
+            type: "string"
+          }
+        }
+        ]
+      requestBody: 
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  example: 'example_commit_id'
+                ref:
+                  type: string
+                  example: "example_tag_name"
+      responses: 
+        '200': 
+          description: OK
+        '400': 
+          description: No such repository
+  /repositories/{repository_name}/tags/{tag_name}:
+    get: 
+      description: >-
+        Get the content of the tag
+      parameters: [
+        {
+          name: "repository_name",
+          in: "path",
+          description: "the repository to query the tags for",
+          required: true, 
+          schema: {
+            type: "string"
+          }
+        },
+        {
+          name: "tag_name",
+          in: "path",
+          description: "the tag to query the content for",
+          required: true, 
+          schema: {
+            type: "string"
+          }
+        }
+        ]
+      responses: 
+        '200':
+          description: OK
+          content: 
+            application/json: 
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string 
+                  commit_id: 
+                    type: string
+        '400': 
+          description: No such repository
+    delete: 
+      description: >-
+        delete tag 
+      parameters: [
+        {
+          name: "repository_name",
+          in: "path",
+          description: "the repository to query the tags for",
+          required: true, 
+          schema: {
+            type: "string"
+          }
+        },
+        {
+          name: "tag_name",
+          in: "path",
+          description: "the tag to query the content for",
+          required: true, 
+          schema: {
+            type: "string"
+          }
+        }
+        ]
+      responses: 
+        '200':
+          description: Tag deleted successfully
+        '400': 
+          description: No such repository
 ### Commits ### 
   /repositories/{repository_name}/{branch_name}/commits:
     get:
@@ -417,7 +553,7 @@ paths:
         '400': 
           description: No such repository or directory
           
-  /repositories/{repository_name}/{branch_name}/commits/{source_ref}/diff/{target_ref}:
+  /repositories/{repository_name}/refs/{source_ref}/diff/{target_ref}:
     get:
       summary: >- 
         Get the diff of two branches or commits
@@ -429,15 +565,6 @@ paths:
           name: "repository_name", 
           in: "path",
           description: "the repository to query the commit for",
-          required: true,
-          schema: {
-            type: "string"
-          }
-        },
-        {
-          name: "branch_name", 
-          in: "path",
-          description: "the target branch to query",
           required: true,
           schema: {
             type: "string"
@@ -467,7 +594,7 @@ paths:
           description: OK
         '400': 
           description: No such repository or directory  
-  /repositories/{repository_name}/{branch_name}/commits/{source_ref}/merge/{target_ref}:
+  /repositories/{repository_name}/refs/{source_ref}/merge/{target_ref}:
     post:
       summary: >- 
         Merge the diff of two branches or commits
@@ -479,15 +606,6 @@ paths:
           name: "repository_name", 
           in: "path",
           description: "the repository to query the commit for",
-          required: true,
-          schema: {
-            type: "string"
-          }
-        },
-        {
-          name: "branch_name", 
-          in: "path",
-          description: "the target branch to query",
           required: true,
           schema: {
             type: "string"
@@ -600,7 +718,7 @@ paths:
         '400':
           description: No such director. 
   ### File-related ###
-  /repositories/{repository_name}/{branch_name}/objects:
+  /repositories/{repository_name}/refs/{ref_name}/objects:
     get:
       summary: >- 
         Get Object content
@@ -617,9 +735,9 @@ paths:
           }
         },
         {
-          name: "branch_name", 
+          name: "ref_name", 
           in: "path",
-          description: "the target branch to query",
+          description: "the target branch or tag to query",
           required: true,
           schema: {
             type: "string"
@@ -660,9 +778,9 @@ paths:
           }
         },
         {
-          name: "branch_name", 
+          name: "ref_name", 
           in: "path",
-          description: "the target branch to upload to",
+          description: "the target branch, or tag to upload to",
           required: true,
           schema: {
             type: "string"
@@ -737,9 +855,9 @@ paths:
           }
         },
         {
-          name: "branch_name", 
+          name: "ref_name", 
           in: "path",
-          description: "the target branch to delete from",
+          description: "the target branch, or tag to delete from",
           required: true,
           schema: {
             type: "string"
@@ -818,41 +936,140 @@ paths:
   #         description: Resource Not Found 
   #       '420': 
   #         description: Too many requests
-  ### File import-related ### 
-  /repositories/{repository_name}/{branch_name}/objects/import:
+  ### File import-related ###  -> not considering this use case
+  # /repositories/{repository_name}/{branch_name}/objects/import:
+  #   get: 
+  #     summary: import data from the object store 
+  #     description: get the progress of the object import job
+  #     parameters: [
+  #       {
+  #         name: "repository_name", 
+  #         in: "path",
+  #         description: "the repository to import the data to",
+  #         required: True,
+  #         schema: {
+  #           type: "string"
+  #         }
+  #       },
+  #       {
+  #         name: "branch_name", 
+  #         in: "path",
+  #         description: "the target branch to uplaod to",
+  #         required: true,
+  #         schema: {
+  #           type: "string"
+  #         }
+  #       }
+  #     ]
+  #     responses: 
+  #       '200':
+  #         description: Import Status
+  #       '401':
+  #         description: Unauthorized 
+  #       '404': 
+  #         description: Resource Not Found 
+  #       '420': 
+  #         description: Too Many Requests
+  
+  
+  ### Auth ### 
+  /auth/users: 
     get: 
-      summary: import data from the object store 
-      description: get the progress of the object import job
+      description: >-
+        get the list of users 
       parameters: [
         {
-          name: "repository_name", 
-          in: "path",
-          description: "the repository to import the data to",
-          required: True,
+          name: "prefix", 
+          in: "query",
+          description: "the prefix filter to search the users for",
+          required: false,
           schema: {
             type: "string"
           }
         },
         {
-          name: "branch_name", 
+          name: "amount", 
+          in: "query",
+          description: "the amount of results the API should return",
+          required: false,
+          schema: {
+            type: "integer"
+          }
+        }
+        ]
+      responses:
+        '200':
+          description: List of users 
+        '401':
+          description: unauthorized
+    post: 
+      description: >- 
+        create a new user. 
+      requestBody: 
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: "unique key for user"
+                  example: '100'
+                sso_id:
+                  type: string
+                  example: 'dougieduk@githbub.com'
+      responses: 
+        200: 
+          description: OK 
+  /auth/users/{user_id}: 
+    get: 
+      description: >-
+        get the user information (sso_id, join_date)
+      parameters: [
+        {
+          name: "user_id", 
           in: "path",
-          description: "the target branch to uplaod to",
+          description: "the user_id to retrieve the information for",
           required: true,
           schema: {
             type: "string"
           }
         }
-      ]
-      responses: 
+        ]
+      responses:
         '200':
-          description: Import Status
-        '401':
-          description: Unauthorized 
-        '404': 
-          description: Resource Not Found 
-        '420': 
-          description: Too Many Requests
+          description: user information
+          content: 
+            application/json: 
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: string 
+                  creation_date: 
+                    type: string
+                  sso_id: 
+                    type: string 
         
+        '401':
+          description: unauthorized
+    delete: 
+      description: >- 
+        delete the user. 
+      parameters: [
+        {
+          name: "user_id", 
+          in: "path",
+          description: "the user_id to delete",
+          required: true,
+          schema: {
+            type: "string"
+          }
+        }
+        ]
+      responses: 
+        200: 
+          description: User deleted
   ### Others ### 
   /healthcheck:
     get:
