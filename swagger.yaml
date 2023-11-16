@@ -292,142 +292,6 @@ paths:
           description: OK
         '400': 
           description: No such repository or directory
-### Tags ### 
-  /repositories/{repository_name}/tags:
-    get: 
-      description: >-
-        Get the list of tags for the repository
-      parameters: [
-        {
-          name: "repository_name",
-          in: "path",
-          description: "the repository to query the tags for",
-          required: true, 
-          schema: {
-            type: "string"
-          }
-        },
-        {
-          name: "prefix",
-          in: "query",
-          description: "the prefix to filter the tags on",
-          required: False, 
-          schema: {
-            type: "string"
-          }
-        },
-        {
-          name: "limit",
-          in: "query",
-          description: "the number of results to return",
-          required: False,
-          schema: {
-            type: "integer"
-          }
-        }
-        ]
-      responses: 
-        '200': 
-          description: OK
-        '400': 
-          description: No such repository
-    post:
-      description: >-
-        Create tag for the provided repository
-      parameters: [
-        {
-          name: "repository_name",
-          in: "path",
-          description: "the repository to query the tags for",
-          required: true, 
-          schema: {
-            type: "string"
-          }
-        }
-        ]
-      requestBody: 
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                id:
-                  type: string
-                  example: 'example_commit_id'
-                ref:
-                  type: string
-                  example: "example_tag_name"
-      responses: 
-        '200': 
-          description: OK
-        '400': 
-          description: No such repository
-  /repositories/{repository_name}/tags/{tag_name}:
-    get: 
-      description: >-
-        Get the content of the tag
-      parameters: [
-        {
-          name: "repository_name",
-          in: "path",
-          description: "the repository to query the tags for",
-          required: true, 
-          schema: {
-            type: "string"
-          }
-        },
-        {
-          name: "tag_name",
-          in: "path",
-          description: "the tag to query the content for",
-          required: true, 
-          schema: {
-            type: "string"
-          }
-        }
-        ]
-      responses: 
-        '200':
-          description: OK
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  id:
-                    type: string 
-                  commit_id: 
-                    type: string
-        '400': 
-          description: No such repository
-    delete: 
-      description: >-
-        delete tag 
-      parameters: [
-        {
-          name: "repository_name",
-          in: "path",
-          description: "the repository to query the tags for",
-          required: true, 
-          schema: {
-            type: "string"
-          }
-        },
-        {
-          name: "tag_name",
-          in: "path",
-          description: "the tag to query the content for",
-          required: true, 
-          schema: {
-            type: "string"
-          }
-        }
-        ]
-      responses: 
-        '200':
-          description: Tag deleted successfully
-        '400': 
-          description: No such repository
 ### Commits ### 
   /repositories/{repository_name}/{branch_name}/commits:
     get:
@@ -553,7 +417,7 @@ paths:
         '400': 
           description: No such repository or directory
           
-  /repositories/{repository_name}/refs/{source_ref}/diff/{target_ref}:
+  /repositories/{repository_name}/{branch_name}/refs/{source_ref}/diff/{target_ref}:
     get:
       summary: >- 
         Get the diff of two branches or commits
@@ -565,6 +429,15 @@ paths:
           name: "repository_name", 
           in: "path",
           description: "the repository to query the commit for",
+          required: true,
+          schema: {
+            type: "string"
+          }
+        },
+        {
+          name: "branch_name", 
+          in: "path",
+          description: "the target branch to query",
           required: true,
           schema: {
             type: "string"
@@ -594,7 +467,7 @@ paths:
           description: OK
         '400': 
           description: No such repository or directory  
-  /repositories/{repository_name}/refs/{source_ref}/merge/{target_ref}:
+  /repositories/{repository_name}/{branch_name}/refs/{source_ref}/merge/{target_ref}:
     post:
       summary: >- 
         Merge the diff of two branches or commits
@@ -606,6 +479,15 @@ paths:
           name: "repository_name", 
           in: "path",
           description: "the repository to query the commit for",
+          required: true,
+          schema: {
+            type: "string"
+          }
+        },
+        {
+          name: "branch_name", 
+          in: "path",
+          description: "the target branch to query",
           required: true,
           schema: {
             type: "string"
@@ -685,6 +567,16 @@ paths:
         Delete the directory. Must be only available to the authorized users. 
       parameters: [
         {
+          name: "X-API-KEY", 
+          in: "header",
+          description: "API key for admins to delete and create new repositories",
+          required: true, 
+          schema: {
+            type: "string", 
+            format: "uuid"
+          }
+        },
+        {
           name: "repository_name", 
           in: "path",
           description: "the target repository to delete the directory in",
@@ -718,7 +610,7 @@ paths:
         '400':
           description: No such director. 
   ### File-related ###
-  /repositories/{repository_name}/refs/{ref_name}/objects:
+  /repositories/{repository_name}/{branch_name}/objects:
     get:
       summary: >- 
         Get Object content
@@ -735,9 +627,9 @@ paths:
           }
         },
         {
-          name: "ref_name", 
+          name: "branch_name", 
           in: "path",
-          description: "the target branch or tag to query",
+          description: "the target branch to query",
           required: true,
           schema: {
             type: "string"
@@ -778,9 +670,9 @@ paths:
           }
         },
         {
-          name: "ref_name", 
+          name: "branch_name", 
           in: "path",
-          description: "the target branch, or tag to upload to",
+          description: "the target branch to upload to",
           required: true,
           schema: {
             type: "string"
@@ -855,9 +747,9 @@ paths:
           }
         },
         {
-          name: "ref_name", 
+          name: "branch_name", 
           in: "path",
-          description: "the target branch, or tag to delete from",
+          description: "the target branch to delete from",
           required: true,
           schema: {
             type: "string"
@@ -973,103 +865,7 @@ paths:
   
   
   ### Auth ### 
-  /auth/users: 
-    get: 
-      description: >-
-        get the list of users 
-      parameters: [
-        {
-          name: "prefix", 
-          in: "query",
-          description: "the prefix filter to search the users for",
-          required: false,
-          schema: {
-            type: "string"
-          }
-        },
-        {
-          name: "amount", 
-          in: "query",
-          description: "the amount of results the API should return",
-          required: false,
-          schema: {
-            type: "integer"
-          }
-        }
-        ]
-      responses:
-        '200':
-          description: List of users 
-        '401':
-          description: unauthorized
-    post: 
-      description: >- 
-        create a new user. 
-      requestBody: 
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                id:
-                  type: string
-                  description: "unique key for user"
-                  example: '100'
-                sso_id:
-                  type: string
-                  example: 'dougieduk@githbub.com'
-      responses: 
-        200: 
-          description: OK 
-  /auth/users/{user_id}: 
-    get: 
-      description: >-
-        get the user information (sso_id, join_date)
-      parameters: [
-        {
-          name: "user_id", 
-          in: "path",
-          description: "the user_id to retrieve the information for",
-          required: true,
-          schema: {
-            type: "string"
-          }
-        }
-        ]
-      responses:
-        '200':
-          description: user information
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  user_id:
-                    type: string 
-                  creation_date: 
-                    type: string
-                  sso_id: 
-                    type: string 
-        
-        '401':
-          description: unauthorized
-    delete: 
-      description: >- 
-        delete the user. 
-      parameters: [
-        {
-          name: "user_id", 
-          in: "path",
-          description: "the user_id to delete",
-          required: true,
-          schema: {
-            type: "string"
-          }
-        }
-        ]
-      responses: 
-        200: 
-          description: User deleted
+  
   ### Others ### 
   /healthcheck:
     get:
