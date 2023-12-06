@@ -1,19 +1,21 @@
 openapi: 3.0.0
 servers:
-  # Added by API Auto Mocking Plugin
   - description: SwaggerHub API Auto Mocking
     url: https://virtserver.swaggerhub.com/dougieduk/Dataset_service/1.0.0
+
 info:
   version: "1.0.0"
   title: Dataset Service APIs
   description: >-
     APIs used to read, manipulate, and version the open datasets distributed
     by MLCommons. 
+
 security:
   - application:
       - read
       - write
       - delete
+
 paths:
 ### Repository-related ### 
   /repositories:
@@ -38,8 +40,6 @@ paths:
         Get the list of files or directories for that directory
       description: >-
         Lists the files in the directory or the repository<br>
-        Discussion<br> 
-        1. Should the user be able to list the whole directory from root? (could take a long time due to large number of folders)<br>
       parameters: [
         {
           name: "repository_name", 
@@ -125,13 +125,13 @@ paths:
           description: OK
         '401': 
           description: Unauthorized User
-### Branch level operation ### 
-  /repositories/{repository_name}/branches:
+## namespace level operation ###
+  /repositories/{repository_name}/namespaces:
     get:
       summary: >- 
-        Get the list of branches for that repository
+        Get the list of namespaces for that repository
       description: >-
-        Lists the branches for the specified repository<br>
+        Lists the namespaces for the specified repository<br>
       parameters: [
         {
           name: "repository_name", 
@@ -150,9 +150,9 @@ paths:
           description: No such repository or directory
     post: 
       summary: >-
-        Create a new branch 
+        Create a new namespace 
       description: >-
-        Create a new branch for the specified repository. Source branch should be specified.
+        Create a new namespace for the specified repository. Source namespace should be specified.
       parameters: [
         {
           name: "repository_name", 
@@ -172,21 +172,21 @@ paths:
               properties:
                 name:
                   type: string
-                  example: 'branch_name_new'
+                  example: 'namespace_name_new'
                 source:
                   type: string
-                  example: 'parent_branch_name'
+                  example: 'parent_namespace_name'
       responses:
         '200':
           description: OK
         '400': 
           description: No such repository or directory
-  /repositories/{repository_name}/branches/{branch_name}:
+  /repositories/{repository_name}/refs/{namespace_name}:
     get:
       summary: >- 
-        get branch
+        get namespace
       description: >-
-        get the current commit id for the branch<br>
+        get the current commit id for the namespace<br>
       parameters: [
         {
           name: "repository_name", 
@@ -198,9 +198,9 @@ paths:
           }
         },
         {
-          name: "branch_name", 
+          name: "namespace_name", 
           in: "path",
-          description: "the target branch to query",
+          description: "the target namespace to query",
           required: true,
           schema: {
             type: "string"
@@ -223,23 +223,23 @@ paths:
           description: No such repository or directory
     delete: 
       summary: >- 
-        Delete the specified branch. 
+        Delete the specified namespace. 
       description: >-
-        Delete the specified branch. Must be only available to the authorized users. 
+        Delete the specified namespace. Must be only available to the authorized users. 
       parameters: [
         {
           name: "repository_name", 
           in: "path",
-          description: "the target repository to delete the branch in",
+          description: "the target repository to delete the namespace in",
           required: true,
           schema: {
             type: "string"
           }
         },
         {
-          name: "branch_name", 
+          name: "namespace_name", 
           in: "path",
-          description: "the target branch to delete",
+          description: "the target namespace to delete",
           required: true,
           schema: {
             type: "string"
@@ -248,55 +248,15 @@ paths:
         ]
       responses: 
         '200':
-          description: Requested branch deleted. 
+          description: Requested namespace deleted. 
         '400':
-          description: No such branch. 
-  /repositories/{repository_name}/branches/{branch_name}/revert:
-    post: 
-      summary: >-
-        Revert the branch to a certain commit
-      description: >-
-        Revert the branch to a certain commit or the parent commit
-      parameters: [
-        {
-          name: "repository_name", 
-          in: "path",
-          description: "the repository where the target branch is in",
-          required: true,
-          schema: {
-            type: "string"
-          }
-        },
-        {
-          name: "branch_name", 
-          in: "path",
-          description: "the target branch to revert",
-          required: true,
-          schema: {
-            type: "string"
-          }
-        }
-        ]
-      requestBody: 
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                ref:
-                  type: string
-                  description: the commit_id, branch, and tag to revert to. If ommitted, the branch will be reverted to the most recent commit. 
-                  example: 'branch_name_new'
-      responses:
-        '200':
-          description: OK
-        '400': 
-          description: No such repository or directory
+          description: No such namespace. 
+
 ### Commits ### 
-  /repositories/{repository_name}/{branch_name}/commits:
+  /repositories/{repository_name}/refs/{namespace_name}/commits:
     get:
       summary: >- 
-        Get the list of commits for the repository
+        Get the list of commits for the repository & namespace
       description: >-
         Get the list of the commit ids and their dates (deletion & addition of files) 
       parameters: [
@@ -310,9 +270,9 @@ paths:
           }
         },
         {
-          name: "branch_name", 
+          name: "namespace_name", 
           in: "path",
-          description: "the target branch to query the commits for",
+          description: "the target namespace to query the commits for",
           required: true,
           schema: {
             type: "string"
@@ -340,9 +300,9 @@ paths:
           }
         },
         {
-          name: "branch_name", 
+          name: "namespace_name", 
           in: "path",
-          description: "the target branch to commit",
+          description: "the target namespace to commit",
           required: true,
           schema: {
             type: "string"
@@ -376,7 +336,7 @@ paths:
           description: OK
         '400': 
           description: No such repository or directory
-  /repositories/{repository_name}/{branch_name}/commits/{commit_id}:
+  /repositories/{repository_name}/refs/{namespace_name}/refs/{commit_id}:
     get:
       summary: >- 
         Get the content of a commit for the given commit_id
@@ -393,9 +353,9 @@ paths:
           }
         },
         {
-          name: "branch_name", 
+          name: "namespace_name", 
           in: "path",
-          description: "the target branch to query",
+          description: "the target namespace to query",
           required: true,
           schema: {
             type: "string"
@@ -417,113 +377,14 @@ paths:
         '400': 
           description: No such repository or directory
           
-  /repositories/{repository_name}/{branch_name}/refs/{source_ref}/diff/{target_ref}:
-    get:
-      summary: >- 
-        Get the diff of two branches or commits
-      description: >-
-        Get the diff of two branches or commits. source_ref and target_ref should be
-        branch name or commit id. 
-      parameters: [
-        {
-          name: "repository_name", 
-          in: "path",
-          description: "the repository to query the commit for",
-          required: true,
-          schema: {
-            type: "string"
-          }
-        },
-        {
-          name: "branch_name", 
-          in: "path",
-          description: "the target branch to query",
-          required: true,
-          schema: {
-            type: "string"
-          }
-        },
-        {
-          name: "source_ref", 
-          in: "path",
-          description: "the source commit id or branch to compare with",
-          required: true,
-          schema: {
-            type: "string"
-          }
-        },
-        {
-          name: "target_ref", 
-          in: "path",
-          description: "the commit id or branch to compare with the source ref",
-          required: true,
-          schema: {
-            type: "string"
-          }
-        }
-        ]
-      responses:
-        '200':
-          description: OK
-        '400': 
-          description: No such repository or directory  
-  /repositories/{repository_name}/{branch_name}/refs/{source_ref}/merge/{target_ref}:
-    post:
-      summary: >- 
-        Merge the diff of two branches or commits
-      description: >-
-        Merge two branches or commits. source_ref and target_ref should be
-        branch name or commit id. 
-      parameters: [
-        {
-          name: "repository_name", 
-          in: "path",
-          description: "the repository to query the commit for",
-          required: true,
-          schema: {
-            type: "string"
-          }
-        },
-        {
-          name: "branch_name", 
-          in: "path",
-          description: "the target branch to query",
-          required: true,
-          schema: {
-            type: "string"
-          }
-        },
-        {
-          name: "source_ref", 
-          in: "path",
-          description: "the source commit id or branch to merge",
-          required: true,
-          schema: {
-            type: "string"
-          }
-        },
-        {
-          name: "target_ref", 
-          in: "path",
-          description: "the commit id or branch to merge",
-          required: true,
-          schema: {
-            type: "string"
-          }
-        }
-        ]
-      responses:
-        '200':
-          description: OK
-        '400': 
-          description: No such repository or directory  
+
 ### Directory level operation ### 
-  /repositories/{repository_name}/{branch_name}/{directory_name}:
+  /repositories/{repository_name}/refs/{namespace_name}/{directory_name}:
     get:
       summary: >- 
-        Get the list of files or directories for that branch
+        Get the list of files or directories for that namespace
       description: >-
-        Lists the files in the directory of the repository & branch<br>
+        Lists the files in the directory of the repository & namespace<br>
         Discussion<br> 
         1. Should the user be able to list the whole directory from root? (could take a long time due to large number of folders)<br>
       parameters: [
@@ -537,9 +398,9 @@ paths:
           }
         },
         {
-          name: "branch_name", 
+          name: "namespace_name", 
           in: "path",
-          description: "the target branch to query",
+          description: "the target namespace to query",
           required: true,
           schema: {
             type: "string"
@@ -586,9 +447,9 @@ paths:
           }
         },
         {
-          name: "branch_name", 
+          name: "namespace_name", 
           in: "path",
-          description: "the target branch to query",
+          description: "the target namespace to query",
           required: true,
           schema: {
             type: "string"
@@ -608,9 +469,9 @@ paths:
         '200':
           description: Requested directory deleted. 
         '400':
-          description: No such director. 
+          description: No such directory
   ### File-related ###
-  /repositories/{repository_name}/{branch_name}/objects:
+  /repositories/{repository_name}/refs/{namespace_name}/objects:
     get:
       summary: >- 
         Get Object content
@@ -627,9 +488,9 @@ paths:
           }
         },
         {
-          name: "branch_name", 
+          name: "namespace_name", 
           in: "path",
-          description: "the target branch to query",
+          description: "the target namespace to query",
           required: true,
           schema: {
             type: "string"
@@ -670,9 +531,9 @@ paths:
           }
         },
         {
-          name: "branch_name", 
+          name: "namespace_name", 
           in: "path",
-          description: "the target branch to upload to",
+          description: "the target namespace to upload to",
           required: true,
           schema: {
             type: "string"
@@ -747,9 +608,9 @@ paths:
           }
         },
         {
-          name: "branch_name", 
+          name: "namespace_name", 
           in: "path",
-          description: "the target branch to delete from",
+          description: "the target namespace to delete from",
           required: true,
           schema: {
             type: "string"
@@ -768,6 +629,303 @@ paths:
         '420': 
           description: Too many requests
           
+  
+  
+  
+  ### Auth ###  -> Using Hardcoded X-API-KEY for first iteration
+  
+  ### Others ### 
+  
+  /healthcheck:
+    get:
+      summary: check that the API server is up and running
+      description: >-
+        Heartbeat API to check that the API server is alive 
+      security: []
+      responses:
+        '204':
+          description: the server is alive with no response content. 
+      
+  ### User-related ### -> for the first stage of iteration, we will only have Administrators and normal users using X-API-KEY in the headers
+          
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+        
+    
+## Saved for later iterations ## 
+### Branch level operation ###  -> To be considered in later iteration, using namespace concept as of now
+  # /repositories/{repository_name}/branches:
+  #   get:
+  #     summary: >- 
+  #       Get the list of branches for that repository
+  #     description: >-
+  #       Lists the branches for the specified repository<br>
+  #     parameters: [
+  #       {
+  #         name: "repository_name", 
+  #         in: "path",
+  #         description: "the repository to query",
+  #         required: true,
+  #         schema: {
+  #           type: "string"
+  #         }
+  #       }
+  #       ]
+  #     responses:
+  #       '200':
+  #         description: OK
+  #       '400': 
+  #         description: No such repository or directory
+  #   post: 
+  #     summary: >-
+  #       Create a new branch 
+  #     description: >-
+  #       Create a new branch for the specified repository. Source branch should be specified.
+  #     parameters: [
+  #       {
+  #         name: "repository_name", 
+  #         in: "path",
+  #         description: "the repository to query",
+  #         required: true,
+  #         schema: {
+  #           type: "string"
+  #         }
+  #       }
+  #       ]
+  #     requestBody: 
+  #       content:
+  #         application/json:
+  #           schema:
+  #             type: object
+  #             properties:
+  #               name:
+  #                 type: string
+  #                 example: 'branch_name_new'
+  #               source:
+  #                 type: string
+  #                 example: 'parent_branch_name'
+  #     responses:
+  #       '200':
+  #         description: OK
+  #       '400': 
+  #         description: No such repository or directory
+  # /repositories/{repository_name}/branches/{branch_name}:
+  #   get:
+  #     summary: >- 
+  #       get branch
+  #     description: >-
+  #       get the current commit id for the branch<br>
+  #     parameters: [
+  #       {
+  #         name: "repository_name", 
+  #         in: "path",
+  #         description: "the repository to query",
+  #         required: true,
+  #         schema: {
+  #           type: "string"
+  #         }
+  #       },
+  #       {
+  #         name: "branch_name", 
+  #         in: "path",
+  #         description: "the target branch to query",
+  #         required: true,
+  #         schema: {
+  #           type: "string"
+  #         }
+  #       }
+  #       ]
+  #     responses:
+  #       '200':
+  #         description: OK
+  #         content: 
+  #           application/json: 
+  #             schema:
+  #               type: object
+  #               properties:
+  #                 id:
+  #                   type: string 
+  #                 commit_id: 
+  #                   type: string
+  #       '400': 
+  #         description: No such repository or directory
+  #   delete: 
+  #     summary: >- 
+  #       Delete the specified branch. 
+  #     description: >-
+  #       Delete the specified branch. Must be only available to the authorized users. 
+  #     parameters: [
+  #       {
+  #         name: "repository_name", 
+  #         in: "path",
+  #         description: "the target repository to delete the branch in",
+  #         required: true,
+  #         schema: {
+  #           type: "string"
+  #         }
+  #       },
+  #       {
+  #         name: "branch_name", 
+  #         in: "path",
+  #         description: "the target branch to delete",
+  #         required: true,
+  #         schema: {
+  #           type: "string"
+  #         }
+  #       }
+  #       ]
+  #     responses: 
+  #       '200':
+  #         description: Requested branch deleted. 
+  #       '400':
+  #         description: No such branch. 
+  # /repositories/{repository_name}/branches/{branch_name}/revert:  # To be saved for later Iteration
+  #   post: 
+  #     summary: >-
+  #       Revert the branch to a certain commit
+  #     description: >-
+  #       Revert the branch to a certain commit or the parent commit
+  #     parameters: [
+  #       {
+  #         name: "repository_name", 
+  #         in: "path",
+  #         description: "the repository where the target branch is in",
+  #         required: true,
+  #         schema: {
+  #           type: "string"
+  #         }
+  #       },
+  #       {
+  #         name: "branch_name", 
+  #         in: "path",
+  #         description: "the target branch to revert",
+  #         required: true,
+  #         schema: {
+  #           type: "string"
+  #         }
+  #       }
+  #       ]
+  #     requestBody: 
+  #       content:
+  #         application/json:
+  #           schema:
+  #             type: object
+  #             properties:
+  #               ref:
+  #                 type: string
+  #                 description: the commit_id, branch, and tag to revert to. If ommitted, the branch will be reverted to the most recent commit. 
+  #                 example: 'branch_name_new'
+  #     responses:
+  #       '200':
+  #         description: OK
+  #       '400': 
+  #         description: No such repository or directory
+    # /repositories/{repository_name}/{branch_name}/refs/{source_ref}/diff/{target_ref}: # Saved for later iterations
+  #   get:
+  #     summary: >- 
+  #       Get the diff of two branches or commits
+  #     description: >-
+  #       Get the diff of two branches or commits. source_ref and target_ref should be
+  #       branch name or commit id. 
+  #     parameters: [
+  #       {
+  #         name: "repository_name", 
+  #         in: "path",
+  #         description: "the repository to query the commit for",
+  #         required: true,
+  #         schema: {
+  #           type: "string"
+  #         }
+  #       },
+  #       {
+  #         name: "branch_name", 
+  #         in: "path",
+  #         description: "the target branch to query",
+  #         required: true,
+  #         schema: {
+  #           type: "string"
+  #         }
+  #       },
+  #       {
+  #         name: "source_ref", 
+  #         in: "path",
+  #         description: "the source commit id or branch to compare with",
+  #         required: true,
+  #         schema: {
+  #           type: "string"
+  #         }
+  #       },
+  #       {
+  #         name: "target_ref", 
+  #         in: "path",
+  #         description: "the commit id or branch to compare with the source ref",
+  #         required: true,
+  #         schema: {
+  #           type: "string"
+  #         }
+  #       }
+  #       ]
+  #     responses:
+  #       '200':
+  #         description: OK
+  #       '400': 
+  #         description: No such repository or directory  
+  # /repositories/{repository_name}/{branch_name}/refs/{source_ref}/merge/{target_ref}: # Saved for later iterations
+  #   post:
+  #     summary: >- 
+  #       Merge the diff of two branches or commits
+  #     description: >-
+  #       Merge two branches or commits. source_ref and target_ref should be
+  #       branch name or commit id. 
+  #     parameters: [
+  #       {
+  #         name: "repository_name", 
+  #         in: "path",
+  #         description: "the repository to query the commit for",
+  #         required: true,
+  #         schema: {
+  #           type: "string"
+  #         }
+  #       },
+  #       {
+  #         name: "branch_name", 
+  #         in: "path",
+  #         description: "the target branch to query",
+  #         required: true,
+  #         schema: {
+  #           type: "string"
+  #         }
+  #       },
+  #       {
+  #         name: "source_ref", 
+  #         in: "path",
+  #         description: "the source commit id or branch to merge",
+  #         required: true,
+  #         schema: {
+  #           type: "string"
+  #         }
+  #       },
+  #       {
+  #         name: "target_ref", 
+  #         in: "path",
+  #         description: "the commit id or branch to merge",
+  #         required: true,
+  #         schema: {
+  #           type: "string"
+  #         }
+  #       }
+  #       ]
+  #     responses:
+  #       '200':
+  #         description: OK
+  #       '400': 
+  #         description: No such repository or directory  
+  
+  
   ## meta_data commented out as the metadata should be queried using the croissant files by the users
   # /repositories/{repository_name}/{branch_name}/objects/meta_data:
   #   get: 
@@ -862,62 +1020,4 @@ paths:
   #         description: Resource Not Found 
   #       '420': 
   #         description: Too Many Requests
-  
-  
-  ### Auth ### 
-  
-  ### Others ### 
-  /healthcheck:
-    get:
-      summary: check that the API server is up and running
-      description: >-
-        Heartbeat API to check that the API server is alive 
-      security: []
-      responses:
-        '204':
-          description: the server is alive with no response content. 
-  ### User-related ###
-          
-components:
-  ## Have to define the metadata for repositories
-  ### Example Schemas ### 
-  # schemas:
-  # Order:
-  #   type: object
-  #   properties:
-  #     id:
-  #       type: integer
-  #       format: int64
-  #       example: 10
-  #     petId:
-  #       type: integer
-  #       format: int64
-  #       example: 198772
-  #     quantity:
-  #       type: integer
-  #       format: int32
-  #       example: 7
-  #     shipDate:
-  #       type: string
-  #       format: date-time
-  #     status:
-  #       type: string
-  #       description: Order Status
-  #       example: approved
-  #       enum:
-  #         - placed
-  #         - approved
-  #         - delivered
-  #     complete:
-  #       type: boolean
-  #   xml:
-  #     name: order
-  securitySchemes:
-    application:
-      type: oauth2
-      flows:
-        clientCredentials:
-          tokenUrl: 'http://example.com/oauth/token'
-          scopes:
-            write: allows modifying resources
-            read: allows reading resources
+
