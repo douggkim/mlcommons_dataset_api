@@ -23,37 +23,7 @@ paths:
       summary: >- 
         Get the list of repositories
       description: >-
-        List all the repositories
-      parameters: [
-        {
-          name: "prefix", 
-          in: "query",
-          description: "return items prefixed with this value",
-          required: False,
-          schema: {
-            type: "string"
-          }
-        },
-        {
-          name: "after", 
-          in: "query",
-          description: "return items after this value - used for pagination",
-          required: False,
-          schema: {
-            type: "string"
-          }
-        },
-        {
-          name: "amount", 
-          in: "query",
-          description: "number of items to return",
-          required: False,
-          schema: {
-            type: "string",
-            default: 100
-          }
-        }
-        ]
+        List all the repositories maintained by MLCommons<br>
       responses:
         '200':
           description: return list of repositories
@@ -81,10 +51,8 @@ paths:
                         id: 
                           type: string 
                         creation_date: 
-                          type: string 
-                          format: date-time
-                          example: '1995-09-07T10:40:52Z'
-                        default_ref: 
+                          type: integer
+                        default_namespace: 
                           type: string
         '401': 
           description: Unauthorized User
@@ -112,9 +80,9 @@ paths:
   /repositories/{repository_name}:
     get:
       summary: >- 
-        Get the list of files or directories for that repository
+        Get the list of files or directories for that directory
       description: >-
-        Lists the files in the directory or the repository
+        Lists the files in the directory or the repository<br>
       parameters: [
         {
           name: "repository_name", 
@@ -124,94 +92,43 @@ paths:
           schema: {
             type: "string"
           }
-        },
-        {
-          name: "prefix", 
-          in: "query",
-          description: "return items prefixed with this value",
-          required: False,
-          schema: {
-            type: "string"
-          }
-        },
-        {
-          name: "after", 
-          in: "query",
-          description: "return items after this value - used for pagination",
-          required: False,
-          schema: {
-            type: "string"
-          }
-        },
-        {
-          name: "amount", 
-          in: "query",
-          description: "number of items to return - used for pagination",
-          required: False,
-          schema: {
-            type: "string",
-            default: 100
-          }
         }
         ]
       responses:
         '200':
-          description: return list of directories under that repository
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  pagination:
-                    type: object
-                    properties: 
-                      has_more:
-                        type: boolean
-                      next_offset: 
-                        type: string
-                      results: 
-                        type: integer
-                      max_per_page: 
-                        type: integer
-                  results: 
-                    type: array
-                    items: 
-                      type: object
-                      properties: 
-                        directory_name: 
-                          type: string 
-                        creation_date: 
-                          type: string 
-                          format: date-time
-                          example: '1995-09-07T10:40:52Z'
-        '401': 
-          description: Unauthorized User
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-        '404': 
-          description: repository not found 
-        '420': 
-          description: too many requests. 
-        'default': 
-          description: Internal server error
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-
+          description: OK
+        '400': 
+          description: No such repository or directory
+    ## Check what to put in the body content
+    # post:
+    #   summary: >- 
+    #     Create a new repository based on 
+    #   description: >-
+    #     Lists the files in the directory or the repository<br>
+    #     Discussion<br> 
+    #     1. Should the user be able to list the whole directory from root? (could take a long time due to large number of folders)<br>
+    #     2. How 
+    #   requestBody:
+    #     content:
+    #       application/json:
+    #         schema:
+    #           $ref: '#/components/schemas/Order'
+    #       application/xml:
+    #         schema:
+    #           $ref: '#/components/schemas/Order'
+    #       application/x-www-form-urlencoded:
+    #         schema:
+    #           $ref: '#/components/schemas/Order'
+    #   responses:
+    #     '200':
+    #       description: OK
+    #     '400': 
+    #       description: No such repository or directory
     delete: 
       summary: >- 
         Delete the repository. 
       description: >-
-        Delete the repository. Only available to the authorized users with X-API-KEY. 
+        Delete the repository. Must be only available to the authorized users. 
       parameters: [
         {
           name: "repository_name", 
@@ -221,50 +138,20 @@ paths:
           schema: {
             type: "string"
           }
-        },
-        {
-          name: "X-API-KEY", 
-          in: "header",
-          description: "API key for admins to delete and create new repositories",
-          required: true, 
-          schema: {
-            type: "string", 
-            format: "uuid"
-          }
         }
         ]
       responses: 
-        '204':
+        '200':
           description: Requested Repository deleted. 
-        '401': 
-          description: Unauthorized User
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-        '404': 
-          description: repository not found 
-        '420': 
-          description: too many requests. 
-        'default': 
-          description: Internal server error
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    
+        '400':
+          description: No such repository. 
+          
   /repositories/{repository_name}/metadata:
     get:
       summary: >- 
         Get the metadata of the repository
       description: >-
-        Get metadata about the dataset
+        Get metadata about the dataset referring to the croissant file <br>
       parameters: [
         {
           name: "repository_name", 
@@ -278,42 +165,9 @@ paths:
         ]
       responses:
         '200':
-          description: repository metadata
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  name:
-                    type: string 
-                  '@type':
-                    type: string
-                  description: 
-                    type: string
-                  license: 
-                    type: string 
+          description: OK
         '401': 
           description: Unauthorized User
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-        '404': 
-          description: repository not found 
-        '420': 
-          description: too many requests. 
-        'default': 
-          description: Internal server error
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
 ## namespace level operation ###
   /repositories/{repository_name}/namespaces:
     get:
@@ -330,92 +184,13 @@ paths:
           schema: {
             type: "string"
           }
-        },
-        {
-          name: "prefix", 
-          in: "query",
-          description: "return items prefixed with this value",
-          required: False,
-          schema: {
-            type: "string"
-          }
-        },
-        {
-          name: "after", 
-          in: "query",
-          description: "return items after this value - used for pagination",
-          required: False,
-          schema: {
-            type: "string"
-          }
-        },
-        {
-          name: "amount", 
-          in: "query",
-          description: "number of items to return - used for pagination",
-          required: False,
-          schema: {
-            type: "string",
-            default: 100
-          }
         }
         ]
       responses:
         '200':
-          description: return list of namespaces
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  pagination:
-                    type: object
-                    properties: 
-                      has_more:
-                        type: boolean
-                      next_offset: 
-                        type: string
-                      results: 
-                        type: integer
-                      max_per_page: 
-                        type: integer
-                  results: 
-                    type: array
-                    items: 
-                      type: object
-                      properties: 
-                        id: 
-                          type: string 
-                        namespace: 
-                          type: string
-                        creation_date: 
-                          type: string 
-                          format: date-time
-                          example: '1995-09-07T10:40:52Z'
-                        default_ref: 
-                          type: string
-        '401': 
-          description: Unauthorized User
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-        '404': 
-          description: repository not found 
-        '420': 
-          description: too many requests. 
-        'default': 
-          description: Internal server error
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
+          description: OK
+        '400': 
+          description: No such repository or directory
     post: 
       summary: >-
         Create a new namespace 
@@ -443,85 +218,21 @@ paths:
               properties:
                 new_namespace_name:
                   type: string
-                  description: 'name for the new namespace'
                   example: 'namespace_name_new'
-                source_ref:
+                source_namespace:
                   type: string
-                  description: 'source ref to create the new namespace from' 
-                  example: 'source_ref (ref id, namespace name, repository name)'
+                  example: 'parent_namespace_name'
       responses:
-        '201':
-          description: new namespace created 
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  id:
-                    type: string
-                  creation_date: 
-                    type: string 
-                    format: date-time
-                    example: '1995-09-07T10:40:52Z'
-                  items: 
-                    type: object
-                    properties: 
-                      id: 
-                        type: string 
-                      creation_date: 
-                        type: string 
-                        format: date-time
-                        example: '1995-09-07T10:40:52Z'
-                      default_ref: 
-                        type: string
+        '200':
+          description: OK
         '400': 
-          description: Validation Error
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-        '401': 
-          description: Unauthorized User
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-        '404': 
-          description: repository not found 
-        '409': 
-          description: Resource conflicts with existing namespace 
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-        '420': 
-          description: too many requests. 
-        'default': 
-          description: Internal server error
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-  /repositories/{repository_name}/refs/{namespace_name}:
+          description: No such repository or namespace
+  /repositories/{repository_name}/namespaces/{namespace_name}:
     get:
       summary: >- 
-        get namespace
+        get namespace info
       description: >-
         get the current commit id for the namespace<br>
-        The namespace could be composed of multiple hierarchies, such as '/foo/bar'. <br> 
-        In that case, namespace should be referred to as '/refs/foo/refs/bar' when referring to the namespace in other API endpoints. 
       parameters: [
         {
           name: "repository_name", 
@@ -552,45 +263,15 @@ paths:
                 properties:
                   id:
                     type: string 
-                  name: 
-                    type: string 
-                    description: name of the namespace
-                  creation_date:
+                  commit_id: 
                     type: string
-                    format: date-time
-                    example: '1995-09-07T10:40:52Z'
-                  ref_id: 
-                    type: string
-                    description: most current ref id
-        '401': 
-          description: Unauthorized User
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-        '404': 
-          description: repository or namespace not found 
-        '420': 
-          description: too many requests. 
-        'default': 
-          description: Internal server error
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
+        '400': 
+          description: No such repository or directory
     delete: 
       summary: >- 
         Delete the specified namespace. 
       description: >-
-        Delete the specified namespace. Must be only available to the authorized users. <br>
-        The namespace could be composed of multiple hierarchies, such as '/foo/bar'. <br> 
-        In that case, namespace should be referred to as '/refs/foo/refs/bar' when referring to the namespace in other API endpoints. 
+        Delete the specified namespace. Must be only available to the authorized users. 
       parameters: [
         {
           name: "repository_name", 
@@ -604,7 +285,7 @@ paths:
         {
           name: "namespace_name", 
           in: "path",
-          description: "the target namespace to query",
+          description: "the target namespace to delete",
           required: true,
           schema: {
             type: "string"
@@ -612,40 +293,18 @@ paths:
         }
         ]
       responses: 
-        '204':
+        '200':
           description: Requested namespace deleted. 
-        '401': 
-          description: Unauthorized User
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-        '404': 
-          description: repository or namespace not found 
-        '420': 
-          description: too many requests. 
-        'default': 
-          description: Internal server error
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string          
+        '400':
+          description: No such namespace. 
 
 ### Commits ### 
-  /repositories/{repository_name}/refs/{namespace_name}/commits:
+  /repositories/{repository_name}/namespaces/{namespace_name}/commits:
     get:
       summary: >- 
         Get the list of commits for the repository & namespace
       description: >-
-        Get the list of the commit ids and their dates (deletion & addition of files) <br> 
-        The namespace here could be composed of multiple hierarchies, such as '/foo/bar'. <br> 
-        In that case, namespace should be referred to as '/refs/foo/refs/bar' when referring to the namespace in other API endpoints. <br>
+        Get the list of the commit ids and their dates (deletion & addition of files) 
       parameters: [
         {
           name: "repository_name", 
@@ -659,7 +318,7 @@ paths:
         {
           name: "namespace_name", 
           in: "path",
-          description: "the target ref to query the commits for",
+          description: "the target namespace to query the commits for",
           required: true,
           schema: {
             type: "string"
@@ -668,60 +327,9 @@ paths:
         ]
       responses:
         '200':
-          description: return list of commits for the repository and namespace
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  pagination:
-                    type: object
-                    properties: 
-                      has_more:
-                        type: boolean
-                      next_offset: 
-                        type: string
-                      results: 
-                        type: integer
-                      max_per_page: 
-                        type: integer
-                  results: 
-                    type: array
-                    items: 
-                      type: object
-                      properties: 
-                        id: 
-                          type: string 
-                          description: commit id
-                        commit_date: 
-                          type: string 
-                          format: date-time
-                          example: '1995-09-07T10:40:52Z'
+          description: OK
         '400': 
           description: No such repository or directory
-        '401': 
-          description: Unauthorized User
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-        '404': 
-          description: repository or namespace not found 
-        '420': 
-          description: too many requests. 
-        'default': 
-          description: Internal server error
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-
     post:
       summary: >- 
         Create a comit based on the current status of the repo metadata
@@ -772,74 +380,14 @@ paths:
       responses:
         '200':
           description: OK
-          content: 
-            application/json: 
-              schema: 
-                type: object 
-                properties: 
-                  id: 
-                    type: string 
-                    description: the commit id 
-                  parents: 
-                    type: array
-                    items: 
-                      type: string 
-                  committer: 
-                    type: string 
-                  message: 
-                    type: string
-                  creation_date: 
-                    type: string
-                    format: date-time
-                    example: '1995-09-07T10:40:52Z'
-                  metadata: 
-                    type: object 
-                    properties: 
-                      additional_prop_1:
-                        type: string 
-                      additional_prop_2: 
-                        type: string
-                      additional_prop_3: 
-                        type: string
         '400': 
-          description: validation error
-          content: 
-            application/json: 
-              schema: 
-                type: object 
-                properties: 
-                  message: 
-                    type: string 
-        '401': 
-          description: Unauthorized User
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-        '404': 
-          description: repository or namespace not found 
-        '420': 
-          description: too many requests. 
-        'default': 
-          description: Internal server error
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string          
-  /repositories/{repository_name}/refs/{namespace_name}/refs/{commit_id}:
+          description: No such repository or directory
+  /repositories/{repository_name}/namespaces/{namespace_name}/commits/{commit_id}:
     get:
       summary: >- 
         Get the content of a commit for the given commit_id
       description: >-
-        Get the list of changes for  the commit ids (deletion & addition of files)  <br> 
-        The namespace could be composed of multiple hierarchies, such as '/foo/bar'. <br> 
-        In that case, namespace should be referred to as '/refs/foo/refs/bar' when referring to the namespace in other API endpoints. <br>
+        Get the list of changes for  the commit ids (deletion & addition of files) 
       parameters: [
         {
           name: "repository_name", 
@@ -872,66 +420,17 @@ paths:
       responses:
         '200':
           description: OK
-          content: 
-            application/json: 
-              schema: 
-                type: object
-                properties: 
-                  id: 
-                    type: string 
-                  parents: 
-                    type: array
-                    items: 
-                      type: string 
-                  committer: 
-                    type: string 
-                  message: 
-                    type: string 
-                  creation_date: 
-                    type: string
-                    format: date-time 
-                    example: '1995-09-07T10:40:52Z'
-                  metadata: 
-                    type: object
-                    properties: 
-                      additional_prop_1: 
-                        type: string 
-                      addtional_prop_2: 
-                        type: string 
-                      additional_prop_3: 
-                        type: string
-                  
-        '401': 
-          description: Unauthorized User
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-        '404': 
-          description: repository, namespace, or commit id not found 
-        '420': 
-          description: too many requests. 
-        'default': 
-          description: Internal server error
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string          
+        '400': 
+          description: No such repository or directory
           
 
 ### Directory level operation ### 
-  /repositories/{repository_name}/refs/{namespace_name}/{path_name}:
+  /repositories/{repository_name}/namespaces/{namespace_name}/paths/{path_name}:
     get:
       summary: >- 
-        Get the list of files or directories in that repository/ namespace 
+        Get the list of files or directories for that namespace
       description: >-
-        Get the list of files or directories in that repository/ namespace 
+        Lists the files in the directory of the repository & namespace<br>
       parameters: [
         {
           name: "repository_name", 
@@ -954,101 +453,34 @@ paths:
         {
           name: "path_name", 
           in: "path",
-          description: "the path to query. Queries all the directories in the repository if not provided",
+          description: "the directory to query. Queries all the directories in the repository if not provided",
           required: True,
           schema: {
             type: "string"
-          }
-        },
-        {
-          name: "prefix", 
-          in: "query",
-          description: "return items prefixed with this value",
-          required: False,
-          schema: {
-            type: "string"
-          }
-        },
-        {
-          name: "after", 
-          in: "query",
-          description: "return items after this value - used for pagination",
-          required: False,
-          schema: {
-            type: "string"
-          }
-        },
-        {
-          name: "amount", 
-          in: "query",
-          description: "number of items to return - used for pagination",
-          required: False,
-          schema: {
-            type: "string",
-            default: 100
           }
         }
         ]
       responses:
         '200':
-          description: return list of directories under that repository
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  pagination:
-                    type: object
-                    properties: 
-                      has_more:
-                        type: boolean
-                      next_offset: 
-                        type: string
-                      results: 
-                        type: integer
-                      max_per_page: 
-                        type: integer
-                  results: 
-                    type: array
-                    items: 
-                      type: object
-                      properties: 
-                        directory_name: 
-                          type: string 
-                        creation_date: 
-                          type: string 
-                          format: date-time
-                          example: '1995-09-07T10:40:52Z'
-        '401': 
-          description: Unauthorized User
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-        '404': 
-          description: repository not found 
-        '420': 
-          description: too many requests. 
-        'default': 
-          description: Internal server error
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-
+          description: OK
+        '400': 
+          description: No such repository or directory
     delete: 
       summary: >- 
-        Delete the provided directory or file. 
+        Delete the mentioned directory. 
       description: >-
-        Delete the path. directory or file could be composed of multiple hierarchies<br> 
-        e.g. /foo/bar/file1
+        Delete the directory. Must be only available to the authorized users. 
       parameters: [
+        {
+          name: "X-API-KEY", 
+          in: "header",
+          description: "API key for admins to delete and create new repositories",
+          required: true, 
+          schema: {
+            type: "string", 
+            format: "uuid"
+          }
+        },
         {
           name: "repository_name", 
           in: "path",
@@ -1070,7 +502,7 @@ paths:
         {
           name: "path_name", 
           in: "path",
-          description: "the path to delete. If a directory is provided, all items under the directory will be deleted",
+          description: "the directory to delete",
           required: True,
           schema: {
             type: "string"
@@ -1078,32 +510,12 @@ paths:
         }
         ]
       responses: 
-        '204':
-          description: Requested path (directory or file) deleted. 
-        '401': 
-          description: Unauthorized User
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-        '404': 
-          description: repository/namespace/directory not found 
-        '420': 
-          description: too many requests. 
-        'default': 
-          description: Internal server error
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string          
+        '200':
+          description: Requested directory deleted. 
+        '400':
+          description: No such directory
   ### File-related ###
-  /repositories/{repository_name}/refs/{ref}/objects:
+  /repositories/{repository_name}/namespaces/{namespace_name}/objects:
     get:
       summary: >- 
         Get Object content
@@ -1120,19 +532,19 @@ paths:
           }
         },
         {
-          name: "repository_name", 
+          name: "namespace_name", 
           in: "path",
-          description: "the target repository to query",
-          required: True,
+          description: "the target namespace to query",
+          required: true,
           schema: {
             type: "string"
           }
         },
         {
-          name: "ref", 
+          name: "repository_name", 
           in: "path",
-          description: "the target ref (commit id or a commit id in a ref) to query",
-          required: true,
+          description: "the target repository to query",
+          required: True,
           schema: {
             type: "string"
           }
@@ -1145,38 +557,8 @@ paths:
             application/octet-stream: 
               schema:
                 type: object 
-          headers:
-            Content-Length:
-              schema:
-                type: integer
-              description: Length of the content.
-            Last-Modified:
-              schema:
-                type: string
-                format: date-time 
-                example: '1995-09-07T10:40:52Z'
-        '401': 
-          description: Unauthorized User
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-        '404': 
-          description: resource not found 
-        '420': 
-          description: too many requests. 
-        'default': 
-          description: Internal server error
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
+        '400': 
+          description: No such repository or directory
     post:
       summary: >- 
         Upload Object content
@@ -1193,6 +575,15 @@ paths:
           }
         },
         {
+          name: "namespace_name", 
+          in: "path",
+          description: "the target namespace to upload to",
+          required: true,
+          schema: {
+            type: "string"
+          }
+        },
+        {
           name: "repository_name", 
           in: "path",
           description: "the repository to upload to",
@@ -1200,28 +591,10 @@ paths:
           schema: {
             type: "string"
           }
-        },
-        {
-          name: "ref", 
-          in: "path",
-          description: "the target ref to upload to",
-          required: true,
-          schema: {
-            type: "string"
-          }
         }
         ]
-      requestBody: 
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              properties: 
-                content:
-                    type: string
-                    format: binary
       responses:
-        '201':
+        '200':
           description: Object metadata
           content: 
             application/json: 
@@ -1236,19 +609,8 @@ paths:
                     type: string 
                   size_bytes: 
                     type: integer
-                  checksum: 
-                    type: string
                   metadata: 
                     type: object
-                    properties: 
-                      additional_prop_1: 
-                        type: string
-                      additional_prop_2: 
-                        type: string
-                      additional_prop_3: 
-                        type: string
-                  content-type: 
-                    type: string
         '400': 
           description: validation error
           content:
@@ -1259,34 +621,17 @@ paths:
                   message: 
                     type: string
         '401': 
-          description: Unauthorized User
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
+          description: unauthorized
+        '403': 
+          description: forbidden
         '404': 
           description: resource not found 
-        '420':
-          description: too many requests 
-        'default': 
-          description: Internal server error
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string    
-  /repositories/{repository_name}/refs/{namespace_name}/objects:
     delete:
       summary: >- 
         Delete Object.
       description: >-
-        Hide object from the local repository. Requires Commit to apply it to the remote<br>
-        server. Deleted objects will be hidden in the manifest file. When queried, will return a NotFound error. 
+        Delete object from the local repository. Requires Commit to apply it to the remote 
+        server. Missing objects will return a NotFound error. 
       parameters: [
         {
           name: "path", 
@@ -1320,31 +665,18 @@ paths:
         '204':
           description: Object deleted successfully
         '401': 
-          description: Unauthorized User
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
+          description: unauthorized
+        '403': 
+          description: forbidden
         '404': 
           description: resource not found
         '420': 
           description: Too many requests
-        'default': 
-          description: Internal server error
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string    
+          
   
   
   
-  ### Auth ###  -> Using Hardcoded X-API-KEY for first iteration
+  ### Auth ###  -> Decided to use Hardcoded X-API-KEY for first iteration
   
   ### Others ### 
   
