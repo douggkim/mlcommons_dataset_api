@@ -1,58 +1,54 @@
-# How to host Swagger API documentation with GitHub Pages
-[<img alt="The blog of Peter Evans: How to Host Swagger Documentation With Github Pages" title="View blog post" src="https://peterevans.dev/img/blog-published-badge.svg">](https://peterevans.dev/posts/how-to-host-swagger-docs-with-github-pages/)
+# Data Service Guidelines
 
-This repository is a template for using the [Swagger UI](https://github.com/swagger-api/swagger-ui) to dynamically generate beautiful documentation for your API and host it for free with GitHub Pages.
+# First Iteration
 
-The template will periodically auto-update the Swagger UI dependency and create a pull request. See the [GitHub Actions workflow here](.github/workflows/update-swagger.yml).
+## Main Goal
 
-The example API specification used by this repository can be seen hosted at [https://peter-evans.github.io/swagger-github-pages](https://peter-evans.github.io/swagger-github-pages/).
+- Hosting for important datasets where egress costs are a concern and there are no other good alternatives. A User will be able to stream, upload, and delete files in the dataset.
+- Core Function
+    - Add/Delete a repository and a namespace
+    - Add/Delete/ Change manifest data of files
+    - Stream files
+    - check permission addition & deletion of a repository
 
-## Steps to use this template
+## Design Principles
 
-1. Click the `Use this template` button above to create a new repository from this template.
+- **Granularity:**
+    - One repository corresponds to one dataset
+    - Namespaces will be utilized to manage different versions of the same dataset
+        - e.g. when a user creates a different version of a dataset, he/she/they will be creating a new namespace and commit changes in that namespace
+- **File management**
+    - `should be confirmed` Uploads include the addition of the physical file and the addition of file in the metadata
+    - However, deletions are only reflected on metadata. The physical files will still be in the object storages.
+    - Only Addition and Deletion files will be tracked down. Update of individual files won’t be tracked.
+- **Metadata Management**: Croissant metadata for each file should be managed and accessed manually by the users
+- **Hash Function:**
+    - `should be confirmed` Datasets, hashes, and commits are identified and accessed by their respective hash UIDs
+- **Authorization / Permission Management:**
+    - Permission is managed only for critical function such as deleting a repository
+        - hardcoded X-API-KEY will be used for the critical functions
+    - Anonymous writes and updates are allowed for the first iteration
+- **File Usage:**
+    - Stream use cases are only considered - no download or clone of the entire dataset
+    - This is due to the egress cost
 
-2. Go to the settings for your repository at `https://github.com/{github-username}/{repository-name}/settings` and enable GitHub Pages.
+# Items for Future Iterations
 
-    ![Headers](/screenshots/swagger-github-pages.png?raw=true)
-    
-3. Browse to the Swagger documentation at `https://{github-username}.github.io/{repository-name}/`.
+- **Git Operations:**
+    - Branch Management
+    - Diff / Merge
+- **Metadata Management**
+    - CRUD of each file metadata through APIs
+- **Authorization & Authentication**
+    - OAuth2 through Github accounts
+    - Specified permission management for each user where each user will be allowed to manage their namespace, and branch
 
 
-## Steps to manually configure in your own repository
+# Hosting the Swagger UI Documentation
+The document is hosted using Github Pages. 
 
-1. Download the latest stable release of the Swagger UI [here](https://github.com/swagger-api/swagger-ui/releases).
+1. Change the `swagger.yaml` file content. 
 
-2. Extract the contents and copy the "dist" directory to the root of your repository.
+2. Commit and push the changes. 
 
-3. Move the file "index.html" from the directory "dist" to the root of your repository.
-    ```
-    mv dist/index.html .
-    ```
-    
-4. Copy the YAML specification file for your API to the root of your repository.
-
-5. Edit [dist/swagger-initializer.js](dist/swagger-initializer.js) and change the `url` property to reference your local YAML file. 
-    ```javascript
-        window.ui = SwaggerUIBundle({
-            url: "swagger.yaml",
-        ...
-    ```
-    Then fix any references to files in the "dist" directory.
-    ```html
-    ...
-    <link rel="stylesheet" type="text/css" href="dist/swagger-ui.css" >
-    <link rel="icon" type="image/png" href="dist/favicon-32x32.png" sizes="32x32" />
-    <link rel="icon" type="image/png" href="dist/favicon-16x16.png" sizes="16x16" />    
-    ...
-    <script src="dist/swagger-ui-bundle.js"> </script>
-    <script src="dist/swagger-ui-standalone-preset.js"> </script>    
-    ...
-    ```
-    
-6. Go to the settings for your repository at `https://github.com/{github-username}/{repository-name}/settings` and enable GitHub Pages.
-
-    ![Headers](/screenshots/swagger-github-pages.png?raw=true)
-    
-7. Browse to the Swagger documentation at `https://{github-username}.github.io/{repository-name}/`.
-
-   The example API specification used by this repository can be seen hosted at [https://peter-evans.github.io/swagger-github-pages](https://peter-evans.github.io/swagger-github-pages/).
+3. The change will be committed to the Swagger UI at [this page](https://dougieduk.github.io/mlcommons_dataset_api/)
