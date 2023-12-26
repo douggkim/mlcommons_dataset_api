@@ -18,12 +18,12 @@
     - Namespaces will be utilized to manage different versions of the same dataset
         - e.g. when a user creates a different version of a dataset, he/she/they will be creating a new namespace and commit changes in that namespace
 - **File management**
-    - `should be confirmed` Uploads include the addition of the physical file and the addition of file in the metadata
+    - Uploads include the addition of the physical file and the addition of file in the metadata
     - However, deletions are only reflected on metadata. The physical files will still be in the object storages.
     - Only Addition and Deletion files will be tracked down. Update of individual files won’t be tracked.
 - **Metadata Management**: Croissant metadata for each file should be managed and accessed manually by the users
 - **Hash Function:**
-    - `should be confirmed` Datasets, hashes, and commits are identified and accessed by their respective hash UIDs
+    - Datasets, hashes, and commits are identified and accessed by their respective hash UIDs
 - **Authorization / Permission Management:**
     - Permission is managed only for critical function such as deleting a repository
         - hardcoded X-API-KEY will be used for the critical functions
@@ -33,6 +33,8 @@
     - This is due to the egress cost
 
 # Items for Future Iterations
+- **File Management:**
+    - Uploads include the addition of the physical file and the addition of file in the metadata
 
 - **Git Operations:**
     - Branch Management

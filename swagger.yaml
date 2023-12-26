@@ -559,119 +559,119 @@ paths:
                 type: object 
         '400': 
           description: No such repository or directory
-    post:
-      summary: >- 
-        Upload Object content
-      description: >-
-        Upload the file to the local repository. Requires Commit to upload it to the remote API. 
-      parameters: [
-        {
-          name: "path", 
-          in: "query",
-          description: "the path of the file to upload",
-          required: true,
-          schema: {
-            type: "string"
-          }
-        },
-        {
-          name: "namespace_name", 
-          in: "path",
-          description: "the target namespace to upload to",
-          required: true,
-          schema: {
-            type: "string"
-          }
-        },
-        {
-          name: "repository_name", 
-          in: "path",
-          description: "the repository to upload to",
-          required: True,
-          schema: {
-            type: "string"
-          }
-        }
-        ]
-      responses:
-        '200':
-          description: Object metadata
-          content: 
-            application/json: 
-              schema:
-                type: object
-                properties:
-                  path:
-                    type: string 
-                  path_type: 
-                    type: string
-                  physical_address:
-                    type: string 
-                  size_bytes: 
-                    type: integer
-                  metadata: 
-                    type: object
-        '400': 
-          description: validation error
-          content:
-            application/json: 
-              schema: 
-                type: object
-                properties: 
-                  message: 
-                    type: string
-        '401': 
-          description: unauthorized
-        '403': 
-          description: forbidden
-        '404': 
-          description: resource not found 
-    delete:
-      summary: >- 
-        Delete Object.
-      description: >-
-        Delete object from the local repository. Requires Commit to apply it to the remote 
-        server. Missing objects will return a NotFound error. 
-      parameters: [
-        {
-          name: "path", 
-          in: "query",
-          description: "the path of the file to delete",
-          required: true,
-          schema: {
-            type: "string"
-          }
-        },
-        {
-          name: "repository_name", 
-          in: "path",
-          description: "the repository to delete from",
-          required: True,
-          schema: {
-            type: "string"
-          }
-        },
-        {
-          name: "namespace_name", 
-          in: "path",
-          description: "the target namespace to delete from",
-          required: true,
-          schema: {
-            type: "string"
-          }
-        }
-        ]
-      responses:
-        '204':
-          description: Object deleted successfully
-        '401': 
-          description: unauthorized
-        '403': 
-          description: forbidden
-        '404': 
-          description: resource not found
-        '420': 
-          description: Too many requests
+    # post:
+    #   summary: >- 
+    #     Upload Object content
+    #   description: >-
+    #     Upload the file to the local repository. Requires Commit to upload it to the remote API. 
+    #   parameters: [
+    #     {
+    #       name: "path", 
+    #       in: "query",
+    #       description: "the path of the file to upload",
+    #       required: true,
+    #       schema: {
+    #         type: "string"
+    #       }
+    #     },
+    #     {
+    #       name: "namespace_name", 
+    #       in: "path",
+    #       description: "the target namespace to upload to",
+    #       required: true,
+    #       schema: {
+    #         type: "string"
+    #       }
+    #     },
+    #     {
+    #       name: "repository_name", 
+    #       in: "path",
+    #       description: "the repository to upload to",
+    #       required: True,
+    #       schema: {
+    #         type: "string"
+    #       }
+    #     }
+    #     ]
+    #   responses:
+    #     '200':
+    #       description: Object metadata
+    #       content: 
+    #         application/json: 
+    #           schema:
+    #             type: object
+    #             properties:
+    #               path:
+    #                 type: string 
+    #               path_type: 
+    #                 type: string
+    #               physical_address:
+    #                 type: string 
+    #               size_bytes: 
+    #                 type: integer
+    #               metadata: 
+    #                 type: object
+    #     '400': 
+    #       description: validation error
+    #       content:
+    #         application/json: 
+    #           schema: 
+    #             type: object
+    #             properties: 
+    #               message: 
+    #                 type: string
+    #     '401': 
+    #       description: unauthorized
+    #     '403': 
+    #       description: forbidden
+    #     '404': 
+    #       description: resource not found 
+    # delete:
+    #   summary: >- 
+    #     Delete Object.
+    #   description: >-
+    #     Delete object from the local repository. Requires Commit to apply it to the remote 
+    #     server. Missing objects will return a NotFound error. 
+    #   parameters: [
+    #     {
+    #       name: "path", 
+    #       in: "query",
+    #       description: "the path of the file to delete",
+    #       required: true,
+    #       schema: {
+    #         type: "string"
+    #       }
+    #     },
+    #     {
+    #       name: "repository_name", 
+    #       in: "path",
+    #       description: "the repository to delete from",
+    #       required: True,
+    #       schema: {
+    #         type: "string"
+    #       }
+    #     },
+    #     {
+    #       name: "namespace_name", 
+    #       in: "path",
+    #       description: "the target namespace to delete from",
+    #       required: true,
+    #       schema: {
+    #         type: "string"
+    #       }
+    #     }
+    #     ]
+    #   responses:
+    #     '204':
+    #       description: Object deleted successfully
+    #     '401': 
+    #       description: unauthorized
+    #     '403': 
+    #       description: forbidden
+    #     '404': 
+    #       description: resource not found
+    #     '420': 
+    #       description: Too many requests
           
   
   
